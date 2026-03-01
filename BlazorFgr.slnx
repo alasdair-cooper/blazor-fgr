@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/core/">
+    <Project Path="src/core/BlazorFgr.Core.csproj" />
+  </Folder>
+  <Folder Name="/examples/">
+    <Project Path="examples/web-app/BlazorFgr.WebApp.csproj" />
+  </Folder>
+  <Folder Name="/items/">
+    <File Path="Directory.build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.MD" />
+  </Folder>
+</Solution>

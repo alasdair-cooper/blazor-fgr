@@ -1,0 +1,63 @@
+﻿@using System.Collections.Immutable
+@using BlazorFgr.Core.Primitives
+@using BlazorFgr.Core.Rendering
+
+@page "/weather"
+
+@rendermode InteractiveServer
+
+<PageTitle>Weather</PageTitle>
+
+<h1>Weather</h1>
+
+<p>This component demonstrates showing data.</p>
+
+<SignalView Value="_forecasts">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th aria-label="Temperature in Celsius">Temp. (C)</th>
+                <th aria-label="Temperature in Fahrenheit">Temp. (F)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in context)
+            {
+                <tr>
+                    <td>@forecast.Date.ToShortDateString()</td>
+                    <td>@forecast.TemperatureC</td>
+                    <td>@forecast.TemperatureF</td>
+                    <td>@forecast.Summary</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</SignalView>
+
+@code {
+
+    private readonly Signal<ImmutableArray<WeatherForecast>> _forecasts;
+
+    public Weather() =>
+        _forecasts =
+            Signal.Create(
+                async () =>
+                {
+                    // Simulate asynchronous loading to demonstrate streaming rendering
+                    await Task.Delay(500);
+
+                    var startDate = DateOnly.FromDateTime(DateTime.Now);
+                    var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
+
+                    return Enumerable.Range(1, 5).Select(index => new WeatherForecast(startDate.AddDays(index), Random.Shared.Next(-20, 55), summaries[Random.Shared.Next(summaries.Length)])).ToImmutableArray();
+                },
+                []);
+
+    private record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+    {
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
+
+}
