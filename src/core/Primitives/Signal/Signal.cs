@@ -25,10 +25,10 @@ public class Signal<T>(T value) : ISource, IGettable<T> where T : IEquatable<T>
     }
 
     public void Update(Func<T, T> updater) => Set(updater(Get()));
-
-    public static implicit operator RenderFragment(Signal<T> signal) => FgrView<T>.FromSignal(signal);
-
+    
     public void Subscribe(IDependent dependent) => _subscribers.Add(dependent);
 
     public void Unsubscribe(IDependent dependent) => _subscribers.Remove(dependent);
+    
+    public static implicit operator RenderFragment(Signal<T> signal) => FgrView<T>.FromGettable(signal);
 }

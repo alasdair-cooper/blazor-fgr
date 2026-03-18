@@ -1,6 +1,5 @@
 ﻿using BlazorFgr.Core.Primitives;
 using BlazorFgr.Core.Primitives.Effect;
-using BlazorFgr.Core.Primitives.Signal;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorFgr.Core.Rendering;
@@ -60,7 +59,7 @@ public class FgrView<T> : IComponent where T : IEquatable<T>
         return Task.CompletedTask;
     }
 
-    public static RenderFragment FromSignal(Signal<T> signal) =>
+    public static RenderFragment FromGettable(IGettable<T> signal) =>
         builder =>
         {
             builder.OpenComponent<FgrView<T>>(0);

@@ -1,4 +1,5 @@
 ﻿@using System.Collections.Immutable
+@using BlazorFgr.Core.Primitives.Dispatcher
 @using BlazorFgr.Core.Primitives.Resource
 @using BlazorFgr.Core.Primitives.Signal
 @using BlazorFgr.Core.Rendering
@@ -14,6 +15,21 @@
 <h1>Weather</h1>
 
 <p>This component demonstrates showing data.</p>
+
+<button
+    class="btn btn-primary"
+    @onclick="() => _reloadWeather.Dispatch(_seed.Get() + 1)">
+    <FgrView Value="_reloadWeather">
+        @if (context is DispatcherValue.Running)
+        {
+            <span
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"></span>
+        }
+    </FgrView>
+    <span>Reload Weather</span>
+</button>
 
 <FgrView Value="_forecasts">
     @switch (context)
@@ -56,6 +72,7 @@
     private readonly Resource<int, ImmutableArray<WeatherForecast>> _forecasts;
     private readonly Signal<int> _seed;
     private readonly CancellationTokenSource _cts = new();
+    private readonly Dispatcher<int> _reloadWeather;
 
     public Weather()
     {
@@ -76,29 +93,16 @@
 
                     return [..Enumerable.Range(1, 5).Select(index => new WeatherForecast(startDate.AddDays(index), prng.Next(-20, 55), summaries[prng.Next(summaries.Length)]))];
                 });
-    }
 
-    protected override Task OnInitializedAsync() =>
-        Task.FromResult(
-            _ =
-                Task.Run(
-                    async () =>
-                    {
-                        try
-                        {
-                            while (true)
-                            {
-                                await Task.Delay(3000);
-                                _cts.Token.ThrowIfCancellationRequested();
-                                _seed.Update(x => x + 1);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            await DispatchExceptionAsync(ex);
-                        }
-                        // ReSharper disable once FunctionNeverReturns
-                    }));
+        _reloadWeather =
+            new Dispatcher<int>(
+                async seed =>
+                {
+                    await Task.Delay(1000);
+
+                    _seed.Set(seed);
+                });
+    }
 
     private record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
     {

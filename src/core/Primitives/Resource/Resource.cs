@@ -1,4 +1,7 @@
-﻿namespace BlazorFgr.Core.Primitives.Resource;
+﻿using BlazorFgr.Core.Rendering;
+using Microsoft.AspNetCore.Components;
+
+namespace BlazorFgr.Core.Primitives.Resource;
 
 public class Resource<TSource, TResult> : ISource, IDependent, IGettable<ResourceValue<TResult>> where TSource : IEquatable<TSource>
 {
@@ -87,4 +90,6 @@ public class Resource<TSource, TResult> : ISource, IDependent, IGettable<Resourc
 
         foreach (var subscriber in _subscribers.ToList()) subscriber.Invalidate();
     }
+    
+    public static implicit operator RenderFragment(Resource<TSource, TResult> resource) => FgrView<ResourceValue<TResult>>.FromGettable(resource);
 }

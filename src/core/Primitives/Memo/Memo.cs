@@ -1,6 +1,9 @@
-﻿namespace BlazorFgr.Core.Primitives.Memo;
+﻿using BlazorFgr.Core.Rendering;
+using Microsoft.AspNetCore.Components;
 
-public class Memo<T> : ISource, IDependent, IGettable<T>
+namespace BlazorFgr.Core.Primitives.Memo;
+
+public class Memo<T> : ISource, IDependent, IGettable<T> where T : IEquatable<T>
 {
     private MemoValue<T> _value = new MemoValue<T>.Dirty();
 
@@ -67,4 +70,6 @@ public class Memo<T> : ISource, IDependent, IGettable<T>
 
         foreach (var subscriber in _subscribers.ToList()) subscriber.Invalidate();
     }
+    
+    public static implicit operator RenderFragment(Memo<T> memo) => FgrView<T>.FromGettable(memo);
 }
