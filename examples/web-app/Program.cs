@@ -2,7 +2,7 @@ using BlazorFgr.WebApp.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+builder.Services.AddRazorComponents().AddInteractiveServerComponents(x => x.DetailedErrors = true);
 
 var app = builder.Build();
 

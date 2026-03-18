@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dunet" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
   </ItemGroup>
 

@@ -1,10 +1,13 @@
 ﻿@using System.Collections.Immutable
-@using BlazorFgr.Core.Primitives
+@using BlazorFgr.Core.Primitives.Resource
+@using BlazorFgr.Core.Primitives.Signal
 @using BlazorFgr.Core.Rendering
 
 @page "/weather"
 
 @rendermode InteractiveServer
+
+@implements IDisposable
 
 <PageTitle>Weather</PageTitle>
 
@@ -12,52 +15,96 @@
 
 <p>This component demonstrates showing data.</p>
 
-<SignalView Value="_forecasts">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th aria-label="Temperature in Celsius">Temp. (C)</th>
-                <th aria-label="Temperature in Fahrenheit">Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in context)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</SignalView>
+<FgrView Value="_forecasts">
+    @switch (context)
+    {
+        case ResourceValue<ImmutableArray<WeatherForecast>>.Loading:
+            <p>Loading...</p>
+            break;
+        case ResourceValue<ImmutableArray<WeatherForecast>>.Errored(var ex):
+            <p class="text-danger">An error occurred while loading the data:
+            <pre>@ex</pre></p>
+            break;
+        case ResourceValue<ImmutableArray<WeatherForecast>>.Valid(var val):
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th aria-label="Temperature in Celsius">Temp. (C)</th>
+                        <th aria-label="Temperature in Fahrenheit">Temp. (F)</th>
+                        <th>Summary</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var forecast in val)
+                    {
+                        <tr>
+                            <td>@forecast.Date.ToShortDateString()</td>
+                            <td>@forecast.TemperatureC</td>
+                            <td>@forecast.TemperatureF</td>
+                            <td>@forecast.Summary</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            break;
+    }
+</FgrView>
 
 @code {
 
-    private readonly Signal<ImmutableArray<WeatherForecast>> _forecasts;
+    private readonly Resource<int, ImmutableArray<WeatherForecast>> _forecasts;
+    private readonly Signal<int> _seed;
+    private readonly CancellationTokenSource _cts = new();
 
-    public Weather() =>
+    public Weather()
+    {
+        _seed = new Signal<int>(0);
+
         _forecasts =
-            Signal.Create(
-                async () =>
+            new Resource<int, ImmutableArray<WeatherForecast>>(
+                () => _seed.Get(),
+                async seed =>
                 {
                     // Simulate asynchronous loading to demonstrate streaming rendering
                     await Task.Delay(500);
 
+                    var prng = new Random(seed);
+
                     var startDate = DateOnly.FromDateTime(DateTime.Now);
                     var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
 
-                    return Enumerable.Range(1, 5).Select(index => new WeatherForecast(startDate.AddDays(index), Random.Shared.Next(-20, 55), summaries[Random.Shared.Next(summaries.Length)])).ToImmutableArray();
-                },
-                []);
+                    return [..Enumerable.Range(1, 5).Select(index => new WeatherForecast(startDate.AddDays(index), prng.Next(-20, 55), summaries[prng.Next(summaries.Length)]))];
+                });
+    }
+
+    protected override Task OnInitializedAsync() =>
+        Task.FromResult(
+            _ =
+                Task.Run(
+                    async () =>
+                    {
+                        try
+                        {
+                            while (true)
+                            {
+                                await Task.Delay(3000);
+                                _cts.Token.ThrowIfCancellationRequested();
+                                _seed.Update(x => x + 1);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            await DispatchExceptionAsync(ex);
+                        }
+                        // ReSharper disable once FunctionNeverReturns
+                    }));
 
     private record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
     {
         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
     }
+
+    public void Dispose() => _cts.Dispose();
 
 }
