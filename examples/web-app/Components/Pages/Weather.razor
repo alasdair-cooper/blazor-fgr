@@ -14,35 +14,35 @@
 
 <h1>Weather</h1>
 
-<p>This component demonstrates showing data.</p>
+<p>
+    This component demonstrates showing data.
 
-<button
-    class="btn btn-primary"
-    @onclick="() => _reloadWeather.Dispatch(_seed.Get() + 1)">
-    <FgrView Value="_reloadWeather">
-        @if (context is DispatcherValue.Running)
-        {
-            <span
-                class="spinner-border spinner-border-sm"
-                role="status"
-                aria-hidden="true"></span>
-        }
-    </FgrView>
-    <span>Reload Weather</span>
-</button>
+    <button
+        class="btn btn-primary btn-sm"
+        @onclick="() => _reloadWeather.Dispatch(_seed.Get() + 1)">
+        <DispatcherView Value="_reloadWeather">
+            <Running>
+                <span
+                    class="spinner-border spinner-border-sm"
+                    role="status"
+                    aria-hidden="true"></span>
+            </Running>
+        </DispatcherView>
+        <span>Reload Weather</span>
+    </button>
+</p>
 
-<FgrView Value="_forecasts">
-    @switch (context)
-    {
-        case ResourceValue<ImmutableArray<WeatherForecast>>.Loading:
-            <p>Loading...</p>
-            break;
-        case ResourceValue<ImmutableArray<WeatherForecast>>.Errored(var ex):
-            <p class="text-danger">An error occurred while loading the data:
-            <pre>@ex</pre></p>
-            break;
-        case ResourceValue<ImmutableArray<WeatherForecast>>.Valid(var val):
-            <table class="table">
+<div class="card overflow-hidden">
+    <ResourceView Value="_forecasts">
+        <Loading>
+            <div class="placeholder-glow">
+                <span
+                    class="placeholder w-100"
+                    style="height: 20rem"></span>
+            </div>
+        </Loading>
+        <Loaded>
+            <table class="table card-body">
                 <thead>
                     <tr>
                         <th>Date</th>
@@ -52,7 +52,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var forecast in val)
+                    @foreach (var forecast in context)
                     {
                         <tr>
                             <td>@forecast.Date.ToShortDateString()</td>
@@ -63,9 +63,19 @@
                     }
                 </tbody>
             </table>
-            break;
-    }
-</FgrView>
+        </Loaded>
+        <Errored>
+            <div
+                class="alert alert-danger"
+                role="alert">
+                <p>
+                    An error occurred while loading the data.
+                </p>
+                <pre>@context</pre>
+            </div>
+        </Errored>
+    </ResourceView>
+</div>
 
 @code {
 
@@ -84,7 +94,7 @@
                 async seed =>
                 {
                     // Simulate asynchronous loading to demonstrate streaming rendering
-                    await Task.Delay(500);
+                    await Task.Delay(1000);
 
                     var prng = new Random(seed);
 
