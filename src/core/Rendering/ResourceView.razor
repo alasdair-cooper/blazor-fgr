@@ -12,7 +12,7 @@
         case ResourceValue<TResult>.Errored(var ex):
             @Errored?.Invoke(ex)
             break;
-        case ResourceValue<TResult>.Valid(var val):
+        case ResourceValue<TResult>.Loaded(var val):
             @Loaded?.Invoke(val)
             break;
     }

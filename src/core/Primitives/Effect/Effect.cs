@@ -13,12 +13,10 @@ public class Effect(Action func) : IDependent
 
         _sources.Clear();
 
-        var prev = FgrContext.Current.Value;
-        FgrContext.Current.Value = this;
-
-        func();
-
-        FgrContext.Current.Value = prev;
+        using (FgrContext.CreateScope(this))
+        {
+            func();
+        }
     }
 
     public void Register(ISource source)

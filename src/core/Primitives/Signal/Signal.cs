@@ -10,18 +10,24 @@ public class Signal<T>(T value) : ISource, IGettable<T> where T : IEquatable<T>
 
     public T Get()
     {
-        FgrContext.Current.Value?.Register(this);
-
+        FgrContext.Register(this);
+        
         return _value;
     }
 
     public void Set(T value)
     {
-        if (value.Equals(_value)) return;
+        if (value.Equals(_value))
+        {
+            return;
+        }
 
         _value = value;
 
-        foreach (var subscriber in _subscribers.ToList()) subscriber.Invalidate();
+        foreach (var subscriber in _subscribers.ToList())
+        {
+            subscriber.Invalidate();
+        }
     }
 
     public void Update(Func<T, T> updater) => Set(updater(Get()));

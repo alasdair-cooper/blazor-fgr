@@ -1,6 +1,6 @@
 ﻿using Dunet;
 
-namespace BlazorFgr.Core;
+namespace BlazorFgr.Core.Utilities;
 
 [Union]
 internal partial record Option<T>

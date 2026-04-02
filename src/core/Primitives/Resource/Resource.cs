@@ -9,7 +9,7 @@ public class Resource<TSource, TResult> : ISource, IDependent, IGettable<Resourc
     private readonly HashSet<IDependent> _subscribers = [];
 
     private ResourceValue<TResult> _value = new ResourceValue<TResult>.Loading();
-    private Option<TSource> _currentSource = new Option<TSource>.None();
+    private Utilities.Option<TSource> _currentSource = new Utilities.Option<TSource>.None();
     private readonly Func<TSource> _sourceFunc;
     private readonly Func<TSource, ValueTask<TResult>> _loadFunc;
 
@@ -23,11 +23,11 @@ public class Resource<TSource, TResult> : ISource, IDependent, IGettable<Resourc
 
     public ResourceValue<TResult> Get()
     {
-        FgrContext.Current.Value?.Register(this);
-
+        FgrContext.Register(this);
+        
         return _value;
     }
-    
+
     private void Recompute()
     {
         foreach (var source in _sources.ToList())
@@ -37,18 +37,16 @@ public class Resource<TSource, TResult> : ISource, IDependent, IGettable<Resourc
         
         _sources.Clear();
         
-        var prev = FgrContext.Current.Value;
-        FgrContext.Current.Value = this;
+        using (FgrContext.CreateScope(this))
+        {
+            var val = _sourceFunc();
 
-        var val = _sourceFunc();
-
-        FgrContext.Current.Value = prev;
-
-        if (_currentSource is Option<TSource>.Some(var current) && current.Equals(val)) return;
-        
-        _currentSource = val;
-        
-        Load(val);
+            if (_currentSource is Utilities.Option<TSource>.Some(var current) && current.Equals(val)) return;
+            
+            _currentSource = val;
+            
+            Load(val);
+        }
     }
 
     private async void Load(TSource source)
@@ -57,6 +55,7 @@ public class Resource<TSource, TResult> : ISource, IDependent, IGettable<Resourc
         {
             _value = new ResourceValue<TResult>.Loading();
             Notify();
+            
             _value = await _loadFunc(source).ConfigureAwait(false);
             Notify();
         }
@@ -69,7 +68,10 @@ public class Resource<TSource, TResult> : ISource, IDependent, IGettable<Resourc
 
     private void Notify()
     {
-        foreach (var sub in _subscribers.ToList()) sub.Invalidate();
+        foreach (var sub in _subscribers.ToList())
+        {
+            sub.Invalidate();
+        }
     }
 
     public void Subscribe(IDependent dependent) => _subscribers.Add(dependent);
@@ -88,7 +90,10 @@ public class Resource<TSource, TResult> : ISource, IDependent, IGettable<Resourc
     {
         Recompute();
 
-        foreach (var subscriber in _subscribers.ToList()) subscriber.Invalidate();
+        foreach (var subscriber in _subscribers.ToList())
+        {
+            subscriber.Invalidate();
+        }
     }
     
     public static implicit operator RenderFragment(Resource<TSource, TResult> resource) => FgrView<ResourceValue<TResult>>.FromGettable(resource);

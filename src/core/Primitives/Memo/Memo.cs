@@ -14,19 +14,19 @@ public class Memo<T> : ISource, IDependent, IGettable<T> where T : IEquatable<T>
     public Memo(Func<T> func)
     {
         _func = func;
-        
+
         Recompute();
     }
 
     public T Get()
     {
-        FgrContext.Current.Value?.Register(this);
+        FgrContext.Register(this);
 
         return _value switch
-            {
-                MemoValue<T>.Valid(var value) => value,
-                _ => Recompute()
-            };
+        {
+            MemoValue<T>.Valid(var value) => value,
+            _ => Recompute()
+        };
     }
 
     private T Recompute()
@@ -35,21 +35,17 @@ public class Memo<T> : ISource, IDependent, IGettable<T> where T : IEquatable<T>
         {
             source.Unsubscribe(this);
         }
-        
+
         _sources.Clear();
-        
-        var prev = FgrContext.Current.Value;
-        FgrContext.Current.Value = this;
 
-        var val = _func();
-
-        FgrContext.Current.Value = prev;
-
-        _value = val;
-
-        return val;
+        using (FgrContext.CreateScope(this))
+        {
+            var val = _func();
+            _value = val;
+            return val;
+        }
     }
-    
+
     public void Subscribe(IDependent dependent) => _subscribers.Add(dependent);
 
     public void Unsubscribe(IDependent dependent) => _subscribers.Remove(dependent);
@@ -64,12 +60,18 @@ public class Memo<T> : ISource, IDependent, IGettable<T> where T : IEquatable<T>
 
     public void Invalidate()
     {
-        if (_value is MemoValue<T>.Dirty) return;
+        if (_value is MemoValue<T>.Dirty)
+        {
+            return;
+        }
 
         _value = new MemoValue<T>.Dirty();
 
-        foreach (var subscriber in _subscribers.ToList()) subscriber.Invalidate();
+        foreach (var subscriber in _subscribers.ToList())
+        {
+            subscriber.Invalidate();
+        }
     }
-    
+
     public static implicit operator RenderFragment(Memo<T> memo) => FgrView<T>.FromGettable(memo);
 }

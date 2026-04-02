@@ -1,0 +1,28 @@
+﻿@using BlazorFgr.Core.Primitives
+
+@inherits FgrScope
+
+@typeparam T
+
+@if (ChildContent is not null)
+{
+    @ChildContent(Value.Get())
+}
+else
+{
+    @Value.Get()
+}
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public required IGettable<T> Value { get; set; }
+
+    [Parameter]
+    public RenderFragment<T>? ChildContent { get; set; }
+
+    public static RenderFragment FromGettable(IGettable<T> signal) =>
+        @<FgrView Value="signal" />;
+
+}

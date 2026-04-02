@@ -14,7 +14,9 @@ public class Dispatcher<T>(Func<T, ValueTask> func) : ISource, IGettable<Dispatc
         {
             _value = new DispatcherValue.Running();
             Notify();
+            
             await func(source).ConfigureAwait(false);
+            
             _value = new DispatcherValue.Sleeping();
             Notify();
         }
@@ -27,13 +29,16 @@ public class Dispatcher<T>(Func<T, ValueTask> func) : ISource, IGettable<Dispatc
 
     private void Notify()
     {
-        foreach (var sub in _subscribers.ToList()) sub.Invalidate();
+        foreach (var sub in _subscribers.ToList())
+        {
+            sub.Invalidate();
+        }
     }
 
     public DispatcherValue Get()
     {
-        FgrContext.Current.Value?.Register(this);
-
+        FgrContext.Register(this);
+        
         return _value;
     }
 
