@@ -4,9 +4,13 @@
 @using BlazorFgr.Core.Primitives.Signal
 @using BlazorFgr.Core.Rendering
 
+@code {
+    public static InteractiveServerRenderMode InteractiveServerNoPreRendering = new InteractiveServerRenderMode(false);
+}
+
 @page "/weather"
 
-@rendermode InteractiveServer
+@rendermode InteractiveServerNoPreRendering
 
 @implements IDisposable
 

@@ -17,7 +17,7 @@ button:has(+ .fgr-diagnostics-anchor) {
     inset-inline-start: anchor(left --fgr-diagnostic-anchor);
 }
 
-*:has(> .fgr-diagnostics-anchor):not(:hover) > button:has(+ .fgr-diagnostics-anchor) {
+*:has(> .fgr-diagnostics-anchor):not(:hover) > button:has(+ .fgr-diagnostics-anchor), button button:has(+ .fgr-diagnostics-anchor) {
     display: none;
 }
 

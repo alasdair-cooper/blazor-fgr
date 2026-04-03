@@ -8,33 +8,11 @@ namespace BlazorFgr.Core.Rendering;
 public abstract class FgrScope : IComponent, IDependent
 {
     private readonly HashSet<ISource> _sources = [];
-    private readonly RenderFragment _renderFragment;
+    private RenderFragment? _renderFragment;
     private RenderHandle _renderHandle;
     private bool _hasRenderedAtLeastOnce;
     private int _renderCount;
 
-    protected FgrScope() =>
-        _renderFragment =
-            builder =>
-            {
-                _renderCount++;
-                
-                builder.OpenComponent<FgrDiagnosticsAnchor>(0);
-                builder.AddAttribute(1, nameof(FgrDiagnosticsAnchor.Diagnostics), () => new FgrDiagnostics(_renderCount, _sources.Count));
-                builder.CloseComponent();
-
-                foreach (var source in _sources)
-                {
-                    source.Unsubscribe(this);
-                }
-
-                _sources.Clear();
-
-                using (FgrContext.CreateScope(this))
-                {
-                    BuildRenderTree(builder);
-                }
-            };
 
     public void Register(ISource source)
     {
@@ -72,7 +50,32 @@ public abstract class FgrScope : IComponent, IDependent
         await Render();
     }
 
-    private async Task Render() => await _renderHandle.Dispatcher.InvokeAsync(() => _renderHandle.Render(_renderFragment));
+    private async Task Render()
+    {
+        _renderFragment ??= RenderFragment;
+        await _renderHandle.Dispatcher.InvokeAsync(() => _renderHandle.Render(_renderFragment));
+    }
+
+    protected virtual RenderFragment RenderFragment => builder =>
+    {
+        _renderCount++;
+
+        foreach (var source in _sources)
+        {
+            source.Unsubscribe(this);
+        }
+
+        _sources.Clear();
+
+        using (FgrContext.CreateScope(this))
+        {
+            BuildRenderTree(builder);
+        }
+                
+        builder.OpenComponent<FgrDiagnosticsAnchor>(int.MaxValue - 1);
+        builder.AddAttribute(int.MaxValue, nameof(FgrDiagnosticsAnchor.Diagnostics), () => new FgrDiagnostics(_renderCount, _sources.Count));
+        builder.CloseComponent();
+    }; 
 
     protected virtual void BuildRenderTree(RenderTreeBuilder _) { }
 }

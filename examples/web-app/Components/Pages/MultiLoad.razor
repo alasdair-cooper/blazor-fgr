@@ -1,0 +1,46 @@
+﻿@using BlazorFgr.Core.Primitives.Resource
+@using BlazorFgr.Core.Rendering
+@using BlazorFgr.Core.Rendering.Suspense
+
+@page "/multi-load"
+
+@inherits FgrComponentBase
+
+@rendermode InteractiveServer
+
+<PageTitle>Multi-load</PageTitle>
+
+<h1>Multi-load</h1>
+
+<SuspenseView>
+    <p>@_resourceA.Get()</p>
+    <p>@_resourceB.Get()</p>
+</SuspenseView>
+
+@code {
+
+    private readonly Resource<int, string> _resourceA;
+    private readonly Resource<int, string> _resourceB;
+
+    public MultiLoad()
+    {
+        _resourceA =
+            new Resource<int, string>(
+                () => 123,
+                async i =>
+                {
+                    await Task.Delay(1000);
+                    return $"A: {i}";
+                });
+
+        _resourceB =
+            new Resource<int, string>(
+                () => 456,
+                async i =>
+                {
+                    await Task.Delay(3000);
+                    return $"B: {i}";
+                });
+    }
+
+}

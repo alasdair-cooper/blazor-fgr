@@ -6,8 +6,3 @@ public interface ISource
     
     public void Unsubscribe(IDependent dependent);
 }
-
-public interface IGettable<out T> 
-{
-    public T Get();
-}

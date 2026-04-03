@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace BlazorFgr.Core.Primitives.Resource;
 
-public class Resource<TSource, TResult> : ISource, IDependent, IGettable<ResourceValue<TResult>> where TSource : IEquatable<TSource>
+public class Resource<TSource, TResult> : ISource, IDependent, IGettable<ResourceValue<TResult>>, IWaitable where TSource : IEquatable<TSource>
 {
     private readonly HashSet<ISource> _sources = [];
     private readonly HashSet<IDependent> _subscribers = [];
@@ -97,4 +97,6 @@ public class Resource<TSource, TResult> : ISource, IDependent, IGettable<Resourc
     }
     
     public static implicit operator RenderFragment(Resource<TSource, TResult> resource) => FgrView<ResourceValue<TResult>>.FromGettable(resource);
+
+    public bool IsReady() => _value is ResourceValue<TResult>.Loaded;
 }
