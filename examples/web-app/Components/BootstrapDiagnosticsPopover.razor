@@ -1,0 +1,19 @@
+﻿@using BlazorFgr.Core.Utilities.Diagnostics
+
+<FgrDiagnosticsPopover Class="border-0">
+    <div class="card" style="min-width: 8rem">
+        <div class="card-body">
+            <FgrDiagnosticsPopoverCloseButton Class="btn-close float-end" />
+            <div class="mb-3 row">
+                <label for="renderCount" class="col-sm-6 col-form-label">Render Count</label>
+                <div class="col-sm-6">
+                    <input type="text" readonly class="form-control-plaintext" id="renderCount" value="@context.RenderCount">
+                </div>
+            </div>
+        </div>
+    </div>
+</FgrDiagnosticsPopover>
+
+<FgrDiagnosticsPopoverShowButton Class="btn btn-primary">
+    Diagnostics
+</FgrDiagnosticsPopoverShowButton>

@@ -7,14 +7,14 @@
     <CascadingValue
         Value="this"
         IsFixed="true">
-        <FgrDiagnosticsPopover
-            Diagnostics="@Diagnostics" />
-        @Options.Value.DiagnosticsPopoverShowButtonContent
-        <div class="fgr-diagnostics-anchor"></div>
+        @Options.Value.DiagnosticsPopoverContent
+        <div class="@Class"></div>
     </CascadingValue>
 }
 
 @code {
+
+    private string Class => "fgr-diagnostics-anchor" + Options.Value.DiagnosticsAnchorAdditionalClass?.Trim();
 
     [Parameter]
     public string DialogId { get; set; } = $"fgr-diagnostics-{Guid.NewGuid()}";

@@ -1,34 +1,30 @@
-﻿@using Microsoft.Extensions.Options
-
-@inject IOptions<FgrOptions> FgrOptions
-
-<div
+﻿<div
     id="@Anchor?.DialogId"
+    class="@Class"
+    style="@Style"
+    @attributes="AdditionalAttributes"
     popover>
-    @FgrOptions.Value.DiagnosticsPopoverContent.Invoke(Diagnostics)
+    @if (Anchor?.Diagnostics is not null)
+    {
+        @ChildContent?.Invoke(Anchor.Diagnostics)
+    }
 </div>
 
 @code {
 
-    // @formatter:off
-    public static RenderFragment<FgrDiagnostics> DefaultDiagnosticsContent =>
-        diagnostics =>
-            @<text>
-                 <FgrDiagnosticsPopoverCloseButton>
-                     x
-                 </FgrDiagnosticsPopoverCloseButton>
-                 <dl>
-                     <dt>Render Count</dt>
-                     <dd>@diagnostics.RenderCount</dd>
-                 </dl>
-            </text>;
-    // @formatter:on
-
-    [Parameter]
-    [EditorRequired]
-    public FgrDiagnostics Diagnostics { get; set; }
-
     [CascadingParameter]
     public FgrDiagnosticsAnchor? Anchor { get; set; }
+
+    [Parameter]
+    public RenderFragment<FgrDiagnostics>? ChildContent { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
 }

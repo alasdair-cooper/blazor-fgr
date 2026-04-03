@@ -1,0 +1,26 @@
+﻿@using BlazorFgr.Core.Utilities.Diagnostics
+
+@code {
+
+    public static class RenderFragments
+    {
+        // @formatter:off
+        public static RenderFragment DiagnosticsPopover =>
+            @<text>
+                 <FgrDiagnosticsPopover>
+                     <FgrDiagnosticsPopoverCloseButton>
+                         x
+                     </FgrDiagnosticsPopoverCloseButton>
+                     <dl>
+                         <dt>Render Count</dt>
+                         <dd>@context.RenderCount</dd>
+                     </dl>
+                 </FgrDiagnosticsPopover>
+                 <FgrDiagnosticsPopoverShowButton>
+                     ///
+                 </FgrDiagnosticsPopoverShowButton>
+            </text>;
+        // @formatter:on
+    }
+
+}

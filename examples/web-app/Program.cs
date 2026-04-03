@@ -5,7 +5,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents(x => x.DetailedErrors = true);
 
-builder.Services.AddBlazorFgr(x => x.AreDiagnosticsEnabled = true);
+builder.Services.AddBlazorFgr(x =>
+{
+    x.AreDiagnosticsEnabled = true;
+    x.SetDiagnosticsPopoverContent<BootstrapDiagnosticsPopover>();
+});
 
 var app = builder.Build();
 
