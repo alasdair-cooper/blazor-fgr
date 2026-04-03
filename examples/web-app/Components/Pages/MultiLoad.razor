@@ -1,4 +1,5 @@
-﻿@using BlazorFgr.Core.Primitives.Resource
+﻿@using BlazorFgr.Core
+@using BlazorFgr.Core.Primitives.Resource
 @using BlazorFgr.Core.Rendering
 @using BlazorFgr.Core.Rendering.Suspense
 
@@ -12,10 +13,10 @@
 
 <h1>Multi-load</h1>
 
-<SuspenseView>
-    <p>@_resourceA.Get()</p>
-    <p>@_resourceB.Get()</p>
-</SuspenseView>
+<SuspenseWithView Resource="() => (_resourceA.Value, _resourceB.Value).Transpose()">
+    <p>@context.Item1</p>
+    <p>@context.Item2</p>
+</SuspenseWithView>
 
 @code {
 

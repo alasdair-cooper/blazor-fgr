@@ -8,29 +8,31 @@ public class Signal<T>(T value) : ISource, IGettable<T> where T : IEquatable<T>
     private T _value = value;
     private readonly HashSet<IDependent> _subscribers = [];
 
-    public T Get()
+    public T Value
     {
-        FgrContext.Register(this);
+        get
+        {
+            FgrContext.Register(this);
         
-        return _value;
+            return _value;
+        }
+        set
+        {
+            if (value.Equals(_value))
+            {
+                return;
+            }
+
+            _value = value;
+
+            foreach (var subscriber in _subscribers.ToList())
+            {
+                subscriber.Invalidate();
+            }
+        }
     }
 
-    public void Set(T value)
-    {
-        if (value.Equals(_value))
-        {
-            return;
-        }
-
-        _value = value;
-
-        foreach (var subscriber in _subscribers.ToList())
-        {
-            subscriber.Invalidate();
-        }
-    }
-
-    public void Update(Func<T, T> updater) => Set(updater(Get()));
+    public void Update(Func<T, T> updater) => Value = updater(Value);
     
     public void Subscribe(IDependent dependent) => _subscribers.Add(dependent);
 

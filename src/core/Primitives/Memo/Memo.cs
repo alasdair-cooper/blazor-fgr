@@ -18,15 +18,18 @@ public class Memo<T> : ISource, IDependent, IGettable<T> where T : IEquatable<T>
         Recompute();
     }
 
-    public T Get()
+    public T Value
     {
-        FgrContext.Register(this);
-
-        return _value switch
+        get
         {
-            MemoValue<T>.Valid(var value) => value,
-            _ => Recompute()
-        };
+            FgrContext.Register(this);
+
+            return _value switch
+            {
+                MemoValue<T>.Valid(var value) => value,
+                _ => Recompute()
+            };
+        }
     }
 
     private T Recompute()

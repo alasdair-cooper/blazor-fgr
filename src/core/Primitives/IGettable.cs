@@ -2,5 +2,5 @@
 
 public interface IGettable<out T> 
 {
-    public T Get();
+    public T Value { get; }
 }

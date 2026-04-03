@@ -8,6 +8,6 @@ public partial record ResourceValue<T>
     public partial record Loaded(T Value);
 
     public partial record Loading;
-    
+
     public partial record Errored(Exception Error);
 }

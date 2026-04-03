@@ -1,27 +1,23 @@
 ﻿@using BlazorFgr.Core.Primitives.Dispatcher
 
-@typeparam T where T : IEquatable<T>
-
-<FgrView Value="Value">
-    @switch (context)
-    {
-        case DispatcherValue.Running:
-            @Running
-            break;
-        case DispatcherValue.Errored(var ex):
-            @Errored?.Invoke(ex)
-            break;
-        case DispatcherValue.Sleeping:
-            @Sleeping
-            break;
-    }
-</FgrView>
+@switch (Value)
+{
+    case DispatcherValue.Running:
+        @Running
+        break;
+    case DispatcherValue.Errored(var ex):
+        @Errored?.Invoke(ex)
+        break;
+    case DispatcherValue.Sleeping:
+        @Sleeping
+        break;
+}
 
 @code {
 
     [Parameter]
     [EditorRequired]
-    public Dispatcher<T> Value { get; set; }
+    public DispatcherValue Value { get; set; }
 
     [Parameter]
     public RenderFragment? Running { get; set; }

@@ -4,13 +4,11 @@
 @using BlazorFgr.Core.Primitives.Signal
 @using BlazorFgr.Core.Rendering
 
-@code {
-    public static InteractiveServerRenderMode InteractiveServerNoPreRendering = new InteractiveServerRenderMode(false);
-}
-
 @page "/weather"
 
-@rendermode InteractiveServerNoPreRendering
+@rendermode InteractiveServer
+
+@inherits FgrComponentBase
 
 @implements IDisposable
 
@@ -23,8 +21,8 @@
 
     <button
         class="btn btn-primary btn-sm"
-        @onclick="() => _reloadWeather.Dispatch(_seed.Get() + 1)">
-        <DispatcherView Value="_reloadWeather">
+        @onclick="() => _reloadWeather.Dispatch(_seed.Value + 1)">
+        <DispatcherView Value="_reloadWeather.Value">
             <Running>
                 <span
                     class="spinner-border spinner-border-sm"
@@ -37,7 +35,7 @@
 </p>
 
 <div class="card overflow-hidden">
-    <ResourceView Value="_forecasts">
+    <ResourceView Value="_forecasts.Value">
         <Loading>
             <div class="placeholder-glow">
                 <span
@@ -94,7 +92,7 @@
 
         _forecasts =
             new Resource<int, ImmutableArray<WeatherForecast>>(
-                () => _seed.Get(),
+                () => _seed.Value,
                 async seed =>
                 {
                     // Simulate asynchronous loading to demonstrate streaming rendering
@@ -114,7 +112,7 @@
                 {
                     await Task.Delay(1000);
 
-                    _seed.Set(seed);
+                    _seed.Value = seed;
                 });
     }
 

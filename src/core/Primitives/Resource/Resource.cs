@@ -21,11 +21,14 @@ public class Resource<TSource, TResult> : ISource, IDependent, IGettable<Resourc
         Recompute();
     }
 
-    public ResourceValue<TResult> Get()
+    public ResourceValue<TResult> Value
     {
-        FgrContext.Register(this);
-        
-        return _value;
+        get
+        {
+            FgrContext.Register(this);
+
+            return _value;
+        }
     }
 
     private void Recompute()
@@ -34,17 +37,17 @@ public class Resource<TSource, TResult> : ISource, IDependent, IGettable<Resourc
         {
             source.Unsubscribe(this);
         }
-        
+
         _sources.Clear();
-        
+
         using (FgrContext.CreateScope(this))
         {
             var val = _sourceFunc();
 
             if (_currentSource is Utilities.Option<TSource>.Some(var current) && current.Equals(val)) return;
-            
+
             _currentSource = val;
-            
+
             Load(val);
         }
     }
@@ -55,7 +58,7 @@ public class Resource<TSource, TResult> : ISource, IDependent, IGettable<Resourc
         {
             _value = new ResourceValue<TResult>.Loading();
             Notify();
-            
+
             _value = await _loadFunc(source).ConfigureAwait(false);
             Notify();
         }
@@ -95,7 +98,7 @@ public class Resource<TSource, TResult> : ISource, IDependent, IGettable<Resourc
             subscriber.Invalidate();
         }
     }
-    
+
     public static implicit operator RenderFragment(Resource<TSource, TResult> resource) => FgrView<ResourceValue<TResult>>.FromGettable(resource);
 
     public bool IsReady() => _value is ResourceValue<TResult>.Loaded;

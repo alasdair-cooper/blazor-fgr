@@ -35,11 +35,14 @@ public class Dispatcher<T>(Func<T, ValueTask> func) : ISource, IGettable<Dispatc
         }
     }
 
-    public DispatcherValue Get()
+    public DispatcherValue Value
     {
-        FgrContext.Register(this);
-        
-        return _value;
+        get
+        {
+            FgrContext.Register(this);
+
+            return _value;
+        }
     }
 
     public void Subscribe(IDependent dependent) => _subscribers.Add(dependent);

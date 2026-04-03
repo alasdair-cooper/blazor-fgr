@@ -1,0 +1,21 @@
+﻿@using BlazorFgr.Core.Primitives.Resource
+
+@typeparam T
+
+<SuspenseView>
+    @if (Resource() is ResourceValue<T>.Loaded(var val))
+    {
+        @ChildContent?.Invoke(val)
+    }
+</SuspenseView>
+
+@code {
+
+    [Parameter]
+    public RenderFragment<T>? ChildContent { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public Func<ResourceValue<T>> Resource { get; set; }
+
+}

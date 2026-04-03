@@ -71,10 +71,13 @@ public abstract class FgrScope : IComponent, IDependent
         {
             BuildRenderTree(builder);
         }
-                
-        builder.OpenComponent<FgrDiagnosticsAnchor>(int.MaxValue - 1);
-        builder.AddAttribute(int.MaxValue, nameof(FgrDiagnosticsAnchor.Diagnostics), () => new FgrDiagnostics(_renderCount, _sources.Count));
-        builder.CloseComponent();
+
+        if (_renderHandle.RendererInfo.IsInteractive)
+        {
+            builder.OpenComponent<FgrDiagnosticsAnchor>(int.MaxValue - 1);
+            builder.AddAttribute(int.MaxValue, nameof(FgrDiagnosticsAnchor.Diagnostics), () => new FgrDiagnostics(_renderCount, _sources.Count));
+            builder.CloseComponent();
+        }
     }; 
 
     protected virtual void BuildRenderTree(RenderTreeBuilder _) { }

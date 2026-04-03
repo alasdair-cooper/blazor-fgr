@@ -1,28 +1,25 @@
 ﻿@using BlazorFgr.Core.Primitives.Resource
 
-@typeparam TSource where TSource : IEquatable<TSource>
 @typeparam TResult
 
-<FgrView Value="Value">
-    @switch (context)
-    {
-        case ResourceValue<TResult>.Loading:
-            @Loading
-            break;
-        case ResourceValue<TResult>.Errored(var ex):
-            @Errored?.Invoke(ex)
-            break;
-        case ResourceValue<TResult>.Loaded(var val):
-            @Loaded?.Invoke(val)
-            break;
-    }
-</FgrView>
+@switch (Value)
+{
+    case ResourceValue<TResult>.Loading:
+        @Loading
+        break;
+    case ResourceValue<TResult>.Errored(var ex):
+        @Errored?.Invoke(ex)
+        break;
+    case ResourceValue<TResult>.Loaded(var val):
+        @Loaded?.Invoke(val)
+        break;
+}
 
 @code {
 
     [Parameter]
     [EditorRequired]
-    public Resource<TSource, TResult> Value { get; set; }
+    public ResourceValue<TResult> Value { get; set; }
 
     [Parameter]
     public RenderFragment? Loading { get; set; }
