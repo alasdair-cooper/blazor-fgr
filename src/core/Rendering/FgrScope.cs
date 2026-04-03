@@ -1,5 +1,4 @@
 ﻿using BlazorFgr.Core.Primitives;
-using BlazorFgr.Core.Utilities;
 using BlazorFgr.Core.Utilities.Diagnostics;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
@@ -19,11 +18,11 @@ public abstract class FgrScope : IComponent, IDependent
             builder =>
             {
                 _renderCount++;
-
-                builder.OpenComponent<FgrDiagnosticsAnchor>(0);
-                builder.AddAttribute(1, nameof(FgrDiagnosticsAnchor.Diagnostics), new FgrDiagnostics(_renderCount));
-                builder.CloseComponent();
                 
+                builder.OpenComponent<FgrDiagnosticsAnchor>(0);
+                builder.AddAttribute(1, nameof(FgrDiagnosticsAnchor.Diagnostics), () => new FgrDiagnostics(_renderCount, _sources.Count));
+                builder.CloseComponent();
+
                 foreach (var source in _sources)
                 {
                     source.Unsubscribe(this);
@@ -45,27 +44,35 @@ public abstract class FgrScope : IComponent, IDependent
         }
     }
 
-    public void Invalidate() => Render();
+    public async void Invalidate()
+    {
+        try
+        {
+            await Render();
+        }
+        catch (Exception ex)
+        {
+            await _renderHandle.DispatchExceptionAsync(ex);
+        }
+    }
 
     public void Attach(RenderHandle renderHandle) => _renderHandle = renderHandle;
 
-    public virtual Task SetParametersAsync(ParameterView parameters)
+    public virtual async Task SetParametersAsync(ParameterView parameters)
     {
         parameters.SetParameterProperties(this);
 
         if (_hasRenderedAtLeastOnce)
         {
-            return Task.CompletedTask;
+            return;
         }
-        
-        _hasRenderedAtLeastOnce = true;
-        
-        Render();
 
-        return Task.CompletedTask;
+        _hasRenderedAtLeastOnce = true;
+
+        await Render();
     }
 
-    private void Render() => _renderHandle.Render(_renderFragment);
-    
+    private async Task Render() => await _renderHandle.Dispatcher.InvokeAsync(() => _renderHandle.Render(_renderFragment));
+
     protected virtual void BuildRenderTree(RenderTreeBuilder _) { }
 }

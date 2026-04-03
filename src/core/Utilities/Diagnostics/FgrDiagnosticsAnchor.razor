@@ -5,10 +5,13 @@
 @if (Options.Value.AreDiagnosticsEnabled)
 {
     <CascadingValue
-        Value="this"
+        Name="popover-id"
+        Value="@PopoverId"
         IsFixed="true">
-        @Options.Value.DiagnosticsPopoverContent
-        <div class="@Class"></div>
+        <CascadingValue Value="@Diagnostics()">
+            @Options.Value.DiagnosticsPopoverContent
+            <div class="@Class"></div>
+        </CascadingValue>
     </CascadingValue>
 }
 
@@ -17,10 +20,10 @@
     private string Class => "fgr-diagnostics-anchor" + Options.Value.DiagnosticsAnchorAdditionalClass?.Trim();
 
     [Parameter]
-    public string DialogId { get; set; } = $"fgr-diagnostics-{Guid.NewGuid()}";
+    public string PopoverId { get; set; } = $"fgr-diagnostics-{Guid.NewGuid()}";
 
     [Parameter]
     [EditorRequired]
-    public FgrDiagnostics Diagnostics { get; set; }
+    public Func<FgrDiagnostics> Diagnostics { get; set; }
 
 }
