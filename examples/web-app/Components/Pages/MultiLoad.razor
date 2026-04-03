@@ -13,7 +13,7 @@
 
 <h1>Multi-load</h1>
 
-<SuspenseWithView Resource="() => (_resourceA.Value, _resourceB.Value).Transpose()">
+<SuspenseWithView Resource="() => (_resourceA, _resourceB).Transpose()">
     <p>@context.Item1</p>
     <p>@context.Item2</p>
 </SuspenseWithView>
