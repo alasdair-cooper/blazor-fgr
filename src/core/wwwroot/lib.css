@@ -10,7 +10,7 @@ button:has(+ .fgr-diagnostics-anchor) {
 }
 
 /*noinspection CssUnresolvedCustomProperty*/
-article:has(+ button + .fgr-diagnostics-anchor) {
+[popover]:has(+ button + .fgr-diagnostics-anchor) {
     position: fixed;
     margin: 0;
     inset-block-start: anchor(top --fgr-diagnostic-anchor);
