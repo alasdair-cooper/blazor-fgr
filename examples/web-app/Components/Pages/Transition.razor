@@ -1,0 +1,45 @@
+﻿@using BlazorFgr.Core.Primitives.Signal
+@using BlazorFgr.Core.Rendering
+
+@page "/transition"
+
+@rendermode InteractiveServer
+
+<PageTitle>Transition</PageTitle>
+
+<h1>Transition</h1>
+
+<FgrView Value="_gridPosition">
+    <TransitionView>
+        <div style="display: grid; grid-template-columns: repeat(@GridDimensions.columns, 8rem); grid-template-rows: repeat(@GridDimensions.rows, 8rem);">
+            <div
+                @onclick="@MoveToRandomPosition"
+                class="bg-primary rounded-5"
+                style="view-transition-name: text; grid-column: @context.column; grid-row: @context.row; cursor: pointer; corner-shape: @CornerShape(context.column, context.row)"></div>
+        </div>
+    </TransitionView>
+</FgrView>
+
+@code {
+
+    private static readonly (int columns, int rows) GridDimensions = (12, 6);
+
+    private readonly Signal<(int column, int row)> _gridPosition = new((0, 0));
+
+    private void MoveToRandomPosition()
+    {
+        var prng = new Random();
+
+        _gridPosition.Value = (prng.Next(GridDimensions.columns), prng.Next(GridDimensions.rows));
+    }
+
+    private static string? CornerShape(int col, int row) =>
+        ((col * row + col) % 4) switch
+        {
+            3 => "squircle",
+            2 => "bevel",
+            0 => "scoop",
+            _ => null
+        };
+    
+}
