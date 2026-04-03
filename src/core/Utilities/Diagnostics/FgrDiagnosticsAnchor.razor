@@ -1,0 +1,26 @@
+﻿@using Microsoft.Extensions.Options
+
+@inject IOptions<FgrOptions> Options
+
+@if (Options.Value.AreDiagnosticsEnabled)
+{
+    <CascadingValue
+        Value="this"
+        IsFixed="true">
+        <FgrDiagnosticsPopover
+            Diagnostics="@Diagnostics" />
+        @Options.Value.DiagnosticsPopoverShowButtonContent
+        <div class="fgr-diagnostics-anchor"></div>
+    </CascadingValue>
+}
+
+@code {
+
+    [Parameter]
+    public string DialogId { get; set; } = $"fgr-diagnostics-{Guid.NewGuid()}";
+
+    [Parameter]
+    [EditorRequired]
+    public FgrDiagnostics Diagnostics { get; set; }
+
+}

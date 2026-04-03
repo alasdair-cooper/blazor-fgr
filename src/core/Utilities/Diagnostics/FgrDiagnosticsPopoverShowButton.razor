@@ -1,0 +1,32 @@
+﻿<button
+    class="@Class"
+    style="@Style"
+    @attributes="AdditionalAttributes"
+    command="show-popover"
+    commandfor="@Anchor?.DialogId">
+    @ChildContent
+</button>
+
+@code {
+
+    public static readonly RenderFragment DefaultContent =
+        @<FgrDiagnosticsPopoverShowButton>
+            ///
+        </FgrDiagnosticsPopoverShowButton>;
+
+    [CascadingParameter]
+    public FgrDiagnosticsAnchor? Anchor { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+}

@@ -1,4 +1,6 @@
 ﻿using BlazorFgr.Core.Primitives;
+using BlazorFgr.Core.Utilities;
+using BlazorFgr.Core.Utilities.Diagnostics;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 
@@ -10,11 +12,18 @@ public abstract class FgrScope : IComponent, IDependent
     private readonly RenderFragment _renderFragment;
     private RenderHandle _renderHandle;
     private bool _hasRenderedAtLeastOnce;
+    private int _renderCount;
 
     protected FgrScope() =>
         _renderFragment =
             builder =>
             {
+                _renderCount++;
+
+                builder.OpenComponent<FgrDiagnosticsAnchor>(0);
+                builder.AddAttribute(1, nameof(FgrDiagnosticsAnchor.Diagnostics), new FgrDiagnostics(_renderCount));
+                builder.CloseComponent();
+                
                 foreach (var source in _sources)
                 {
                     source.Unsubscribe(this);

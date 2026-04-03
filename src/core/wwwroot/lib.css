@@ -1,0 +1,28 @@
+﻿.fgr-diagnostics-anchor {
+    display: none;
+}
+
+/*noinspection CssUnresolvedCustomProperty*/
+button:has(+ .fgr-diagnostics-anchor) {
+    position: fixed;
+    inset-block-start: anchor(top --fgr-diagnostic-anchor);
+    inset-inline-start: anchor(left --fgr-diagnostic-anchor);
+}
+
+/*noinspection CssUnresolvedCustomProperty*/
+article:has(+ button + .fgr-diagnostics-anchor) {
+    position: fixed;
+    margin: 0;
+    inset-block-start: anchor(top --fgr-diagnostic-anchor);
+    inset-inline-start: anchor(left --fgr-diagnostic-anchor);
+}
+
+
+*:has(> .fgr-diagnostics-anchor):not(:hover) > button:has(+ .fgr-diagnostics-anchor) {
+    display: none;
+}
+
+:where(*:has(> .fgr-diagnostics-anchor)) {
+    anchor-name: --fgr-diagnostic-anchor;
+    anchor-scope: --fgr-diagnostic-anchor;
+}

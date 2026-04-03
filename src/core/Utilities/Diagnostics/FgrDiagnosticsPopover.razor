@@ -1,0 +1,34 @@
+﻿@using Microsoft.Extensions.Options
+
+@inject IOptions<FgrOptions> FgrOptions
+
+<div
+    id="@Anchor?.DialogId"
+    popover>
+    @FgrOptions.Value.DiagnosticsPopoverContent.Invoke(Diagnostics)
+</div>
+
+@code {
+
+    // @formatter:off
+    public static RenderFragment<FgrDiagnostics> DefaultDiagnosticsContent =>
+        diagnostics =>
+            @<text>
+                 <FgrDiagnosticsPopoverCloseButton>
+                     x
+                 </FgrDiagnosticsPopoverCloseButton>
+                 <dl>
+                     <dt>Render Count</dt>
+                     <dd>@diagnostics.RenderCount</dd>
+                 </dl>
+            </text>;
+    // @formatter:on
+
+    [Parameter]
+    [EditorRequired]
+    public FgrDiagnostics Diagnostics { get; set; }
+
+    [CascadingParameter]
+    public FgrDiagnosticsAnchor? Anchor { get; set; }
+
+}
